@@ -10,6 +10,7 @@ use App\Models\Post;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Contracts\CategoryServiceInterface;
+
 class CategoryController extends Controller
 {
     /**
@@ -20,7 +21,6 @@ class CategoryController extends Controller
     public function index(Category $category) {
       
         $mycategory = $category->where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(10);
-       
         return view('home',['mycategory'=>$mycategory,'title'=>'MY CATEGORY']);
 
     }
@@ -33,7 +33,8 @@ class CategoryController extends Controller
     public function create(){
         //
     }
-   //dd($categoryService->createCategory());
+
+
     /**
      * Store a newly created resource in storage.
      *
@@ -60,10 +61,10 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id){
-         $categoryid = Category::findOrFail($id);
+    public function edit($id,CategoryServiceInterface $categoryService){
+         $categoryid  =$categoryService->GetCategory($id);
          $title = "EDIT CATEGORY PAGE";
-        return view('/home',compact('categoryid','title'));
+         return view('/home',compact('categoryid','title'));
 
         //return redirect()->route('category.index');
     }
@@ -75,13 +76,10 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCategoryRequest $request, $id){
+    public function update(UpdateCategoryRequest $request, $id,CategoryServiceInterface $categoryService){
         $user = Auth::user()->id; 
-        $data = $request->except('_token');  
-        $updat = Category::findOrFail($id);
-        $updat->name = $data['updcategname'];
-        $updat->user_id = $user;
-        $updat->save();
+        $data = $request->except('_token'); 
+        $categoryService->UpdateCategory($id,$data,$user); 
         return redirect()->route('category.index')->with('status','CATEGORY UPDATED');
     }
 
@@ -91,22 +89,18 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id){
-        $delcategory = Category::findOrFail($id);
-        $delcategory->delete();
+    public function destroy($id,CategoryServiceInterface $categoryService){
+        $categoryService->DeleteCategory($id);
         return redirect()->route('category.index')->with('status','CATEGORY DELETED');
     }
 
-
-    public function add(CategoryRequest $request, Category $category){
+    public function add(CategoryRequest $request, Category $category,CategoryServiceInterface $categoryService){
         if($request->method('post'))
         {       
             $user = Auth::user()->id; 
             $data = $request->except('_token');
-            $category->create([
-                'name'=>$data['add_name'],
-                'user_id'=>$user,
-            ]);
+            $categoryService->createCategory($user,$data);
+            
             return redirect()->route('category.index')->with('status','NEW CATEGORY ADDED');
         }
     }

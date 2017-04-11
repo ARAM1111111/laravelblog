@@ -3,5 +3,9 @@ namespace App\Contracts;
 
 interface CategoryServiceInterface{
 
-	public function createCategory();
+	public function createCategory($user,$data);
+	public function UpdateCategory($id,$data,$user);
+	public function DeleteCategory($id);
+	public function GetAllCategories();
+	public function GetCategory($id);
 }

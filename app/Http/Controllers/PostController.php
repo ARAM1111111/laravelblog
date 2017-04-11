@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
-use Validator;
 use App\Models\Category;
 use App\Models\Post;
 use App\Http\Requests\PostRequest;
+use App\Contracts\PostServiceInterface;
+use App\Contracts\CategoryServiceInterface;
+
 class PostController extends Controller
 {
     public function __construct(Post $post){
@@ -18,7 +20,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Category $category){
+    public function index(){
         $myposts = $this->post->where('user_id',Auth::user()->id)->orderBy('created_at','desc')->paginate(10);
          return view('home',['myposts'=>$myposts,'title'=>'MY POSTS']);
     }
@@ -40,16 +42,11 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(PostRequest $request,Category $category){
-
+    public function store(PostRequest $request,Category $category,PostServiceInterface $postservice){
+      
         $user = Auth::user()->id; 
         $data = $request->except('_token');
-        $this->post->create([
-            'title'=>$data['ptitle'],
-            'text'=>$data['ptext'],
-            'category_id'=>$data['category'],
-            'user_id'=>$user,
-        ]);
+        $postservice->createPost($user,$data);
         return redirect()->route('posts.index')->with('status','NEW POST ADDED');
     }
     
@@ -71,11 +68,10 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id){
-        $postid = Post::findOrFail($id);
-        $categorias = Category::all(); 
+    public function edit($id,PostServiceInterface $postservice,CategoryServiceInterface $categoryservice){
+        $postid = $postservice->EditPost($id);
+        $categorias = $categoryservice->GetAllCategories();
         $title = "EDIT POST PAGE";
-        // dump($postid);
         return view('/home',compact('postid','title','categorias'));
     }
 
@@ -86,15 +82,10 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(PostRequest $request, $id){
+    public function update(PostRequest $request, $id,PostServiceInterface $postservice){
         $user = Auth::user()->id; 
         $data = $request->except('_token');
-        $post = Post::findOrFail($id);
-        $post->title = $data['ptitle'];
-        $post->text = $data['ptext'];
-        $post->category_id = $data['category'];
-        $post->user_id = $user;
-        $post->update();
+        $postservice->UpdatePost($id,$data,$user);
         return redirect()->route('posts.index')->with('status','POST UPDATED');
     }
 
@@ -104,9 +95,8 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id){
-       $delpost = Post::findOrFail($id);
-       $delpost->delete();
-       return redirect()->route('posts.index')->with('status','POST DELETED');
+    public function destroy($id,PostServiceInterface $postservice){
+        $postservice->DeletePost($id);
+        return redirect()->route('posts.index')->with('status','POST DELETED');
     }
 }

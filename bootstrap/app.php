@@ -56,4 +56,9 @@ $app->singleton(
     App\Contracts\CategoryServiceInterface::class,
     App\Services\CategoryService::class
 );
+
+$app->singleton(
+    App\Contracts\PostServiceInterface::class,
+    App\Services\PostService::class
+);
 return $app;
