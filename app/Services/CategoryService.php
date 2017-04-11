@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Contracts\CategoryServiceInterface;
 use App\Models\Category;
+use Auth;
 
 class CategoryService implements CategoryServiceInterface{
 
@@ -19,7 +20,7 @@ class CategoryService implements CategoryServiceInterface{
   }
 
   public function UpdateCategory($id,$data,$user){
-
+      
       $updat = $this->category->findOrFail($id);
       $updat->name = $data['updcategname'];
       $updat->user_id = $user;
@@ -41,6 +42,16 @@ class CategoryService implements CategoryServiceInterface{
   {
     return $this->category->findOrFail($id);
   }
+
+  public function SecurityCategory($id)
+  {
+      if(Auth::user()->id == $this->category->findOrFail($id)->user_id) {
+        
+          return true;
+          // ETE IRA GRACI HETA MANIPULIACIANER ANUM
+      }
+  }
+
 }
 
 

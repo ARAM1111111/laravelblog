@@ -3,7 +3,7 @@ namespace App\Services;
 
 use App\Contracts\PostServiceInterface;
 use App\Models\Post;
-
+use Auth;
 
 class PostService implements PostServiceInterface{
 
@@ -44,5 +44,14 @@ class PostService implements PostServiceInterface{
        $delpost = $this->post->findOrFail($id);
        $delpost->delete();
 
+    }
+
+    public function SecurityPost($id)
+    {
+        if(Auth::user()->id == $this->post->findOrFail($id)->user_id) {
+
+          return true;
+
+        }
     }
 }

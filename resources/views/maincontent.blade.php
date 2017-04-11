@@ -1,5 +1,6 @@
 {{-- =============== All POSTS ============== --}}
-@if(isset($allposts))	
+@if(isset($allposts))
+	<h1>IN SITE {{$allposts->count()}} POSTS</h1>	
      @foreach($allposts as $apost)
 		   <hr>
 		   <h2>{{$apost->title}}</h2>

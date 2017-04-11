@@ -30,7 +30,7 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(){
+    public function create() {
         //
     }
 
@@ -41,7 +41,7 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request){
+    public function store(Request $request) {
         //
     }
 
@@ -51,7 +51,7 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id){
+    public function show($id) {
         //
     }
 
@@ -61,7 +61,7 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id,CategoryServiceInterface $categoryService){
+    public function edit($id,CategoryServiceInterface $categoryService) {
          $categoryid  =$categoryService->GetCategory($id);
          $title = "EDIT CATEGORY PAGE";
          return view('/home',compact('categoryid','title'));
@@ -78,9 +78,18 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, $id,CategoryServiceInterface $categoryService){
         $user = Auth::user()->id; 
-        $data = $request->except('_token'); 
-        $categoryService->UpdateCategory($id,$data,$user); 
-        return redirect()->route('category.index')->with('status','CATEGORY UPDATED');
+        $data = $request->except('_token');
+
+        if($categoryService->SecurityCategory($id)) {
+
+            $categoryService->UpdateCategory($id,$data,$user); 
+            return redirect()->route('category.index')->with('status','CATEGORY UPDATED');
+
+        } else { 
+
+            redirect()->route('category.index')->with('status','You havent premission'); 
+        }
+        
     }
 
     /**
@@ -89,14 +98,22 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id,CategoryServiceInterface $categoryService){
-        $categoryService->DeleteCategory($id);
-        return redirect()->route('category.index')->with('status','CATEGORY DELETED');
+    public function destroy($id,CategoryServiceInterface $categoryService) {
+
+        if($categoryService->SecurityCategory($id)) {
+
+            $categoryService->DeleteCategory($id);
+            return redirect()->route('category.index')->with('status','CATEGORY DELETED');
+        } else { 
+
+            redirect()->route('category.index')->with('status','You havent premission'); 
+        }
+        
     }
 
     public function add(CategoryRequest $request, Category $category,CategoryServiceInterface $categoryService){
-        if($request->method('post'))
-        {       
+
+        if($request->method('post')){       
             $user = Auth::user()->id; 
             $data = $request->except('_token');
             $categoryService->createCategory($user,$data);

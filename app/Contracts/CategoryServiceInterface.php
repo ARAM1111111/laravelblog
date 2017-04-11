@@ -8,4 +8,5 @@ interface CategoryServiceInterface{
 	public function DeleteCategory($id);
 	public function GetAllCategories();
 	public function GetCategory($id);
+	public function SecurityCategory($id);
 }
