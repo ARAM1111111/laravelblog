@@ -14,7 +14,8 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct(){
+    public function __construct() 
+    {
         $this->middleware('auth');
     }
 
@@ -23,14 +24,13 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Post $post, CategoryServiceInterface $categoryService){
-        //dd($categoryService->createCategory());
+    public function index(Post $post, CategoryServiceInterface $categoryService) 
+    {
         $allposts =$post->with(['user','category'])->orderBy('created_at','DESC')->paginate(10);
         return view('home',compact('allposts'));
     }
 
-    public function show($id){
-       
+    public function show($id) {  
         $onepost = Post::findOrFail($id);      
         return view('home',compact('onepost'));
     }

@@ -35,10 +35,10 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
-    'github' => [
-        'client_id' => '23127353',
-        'client_secret' => 'your-github-app-secret',
-        'redirect' => 'http://your-callback-url',
+    'facebook' => [
+        'client_id' => '117538275460138',
+        'client_secret' => 'b085fbceee11a6fb23da4d8acae1cfcc',
+        'redirect' => 'http://laravelblog.dev/login/facebook/callback',
     ],
 
 ];
