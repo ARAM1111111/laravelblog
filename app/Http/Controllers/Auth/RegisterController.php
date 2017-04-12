@@ -63,10 +63,9 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        
-            $file = $data['img'];
-            $input['img'] = time() . str_random(5).'.'.$file->getClientOriginalExtension();
-            $file->move(public_path().'/img',$input['img']);
+        $file = $data['img'];
+        $input['img'] = time() . str_random(5).'.'.$file->getClientOriginalExtension();
+        $file->move(public_path().'/img',$input['img']);
 
         return User::create([
             'name' => $data['name'],

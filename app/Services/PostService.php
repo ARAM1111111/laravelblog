@@ -7,18 +7,18 @@ use Auth;
 
 class PostService implements PostServiceInterface
 {
-    public function __construct(Post $post){
-        
-       $this->post  = $post;
+    public function __construct(Post $post)
+    {      
+       $this->post = $post;
     }
 
-	public function createPost($user,$data)
+	public function createPost($user, $data)
 	{
 	    $this->post->create([
-            'title'=>$data['ptitle'],
-            'text'=>$data['ptext'],
-            'category_id'=>$data['category'],
-            'user_id'=>$user,
+            'title' => $data['ptitle'],
+            'text' => $data['ptext'],
+            'category_id' => $data['category'],
+            'user_id' => $user,
         ]);
 	}
 
@@ -28,7 +28,7 @@ class PostService implements PostServiceInterface
         return $postid;
     }
 
-    public function UpdatePost($id,$data,$user)
+    public function UpdatePost($id, $data, $user)
     {
         $this->post = Post::findOrFail($id);
         $this->post->title = $data['ptitle'];

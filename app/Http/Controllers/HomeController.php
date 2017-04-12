@@ -26,12 +26,13 @@ class HomeController extends Controller
      */
     public function index(Post $post, CategoryServiceInterface $categoryService) 
     {
-        $allposts =$post->with(['user','category'])->orderBy('created_at','DESC')->paginate(10);
-        return view('home',compact('allposts'));
+        $allposts =$post->with(['user','category'])->orderBy('created_at', 'DESC')->paginate(10);
+        return view('home', compact('allposts'));
     }
 
-    public function show($id) {  
+    public function show($id) 
+    {  
         $onepost = Post::findOrFail($id);      
-        return view('home',compact('onepost'));
+        return view('home', compact('onepost'));
     }
 }
