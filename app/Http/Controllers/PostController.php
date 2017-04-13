@@ -5,25 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App\Models\Category;
-use App\Contracts\CategoryServiceInterface;
 use App\Models\Post;
 use App\Http\Requests\PostRequest;
 use App\Contracts\PostServiceInterface;
+use App\Contracts\CategoryServiceInterface;
 
 class PostController extends Controller
 {
-    public function __construct(Post $post) 
-    {
-        $this->post = $post;
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() 
+    public function index(PostServiceInterface $postservice) 
     {
-        $myposts = $this->post->where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->paginate(10);
+        $myposts = $postservice->getUserPosts();
         return view('home', ['myposts' => $myposts,'title' => 'MY POSTS']);
     }
 
@@ -32,9 +28,9 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Category $category) 
+    public function create(CategoryServiceInterface $categoryservice) 
     {
-        $categories = $category->all();
+        $categories = $categoryservice->getAllCategories();
         return view('home', ['newpost' => 'newpost','categories' => $categories]);        
     }
 
@@ -44,7 +40,7 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(PostRequest $request, Category $category, PostServiceInterface $postservice) 
+    public function store(PostRequest $request, PostServiceInterface $postservice) 
     {  
         $user = Auth::user()->id; 
         $data = $request->except('_token');
@@ -58,9 +54,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, PostServiceInterface $postservice)
     {  
-        $onepost = $this->post->where('id', $id)->with('category')->first(); 
+        $onepost = $postservice->getOnePost($id); 
         $onepost['username'] = Auth()->user()->name;
         return view('/home', compact('onepost'));
     }
@@ -73,8 +69,8 @@ class PostController extends Controller
      */
     public function edit($id, PostServiceInterface $postservice, CategoryServiceInterface $categoryservice) 
     {
-        $postid = $postservice->EditPost($id);
-        $categorias = $categoryservice->GetAllCategories();
+        $postid = $postservice->editPost($id);
+        $categorias = $categoryservice->getAllCategories();
         $title = "EDIT POST PAGE";
         return view('/home', compact('postid', 'title', 'categorias'));
     }
@@ -90,8 +86,8 @@ class PostController extends Controller
     {
         $user = Auth::user()->id; 
         $data = $request->except('_token');
-        if ($postservice->SecurityPost($id)) {
-            $postservice->UpdatePost($id, $data, $user);
+        if ($postservice->securityPost($id)) {
+            $postservice->updatePost($id, $data, $user);
             return redirect()->route('posts.index')->with('status', 'POST UPDATED');
         } else {
             redirect()->route('posts.index')->with('status', 'You havent premission'); 
@@ -107,8 +103,8 @@ class PostController extends Controller
 
     public function destroy($id, PostServiceInterface $postservice) 
     {
-        if ($postservice->SecurityPost($id)) {
-            $postservice->DeletePost($id);
+        if ($postservice->securityPost($id)) {
+            $postservice->deletePost($id);
             return redirect()->route('posts.index')->with('status', 'POST DELETED');
         } else {    
             redirect()->route('posts.index')->with('status', 'You havent premission');

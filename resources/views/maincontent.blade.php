@@ -24,7 +24,7 @@
 			   <th>NAME</th>
 			   <th style="width: 20%;text-align: center;">Actions</th>
 			</tr>
-			<a href="#" class="btn btn-info pull-right addcateg" data-toggle="modal" data-target="#myModal">CREATE NEW CATEGORY</a>
+			<a href="{{route('category.create')}}" class="btn btn-info pull-right addcateg">CREATE NEW CATEGORY</a>
 			@foreach($mycategory as $k => $categ)
 			  <tr>
 				<td>{{$categ->name}}</td>
@@ -46,8 +46,28 @@
 	</div>
 @endif
 
-{{-- ===============END SHOW MY CATEGORIAS ============== --}}
+{{-- =============== END SHOW MY CATEGORIAS ============== --}}
 
+{{-- ==================== CREAT MY CATEGORY =============  --}}
+@if(isset($createcategory))
+<h4><small>{{$title}}</small></h4>
+<div class="row">
+	<form method="post" action="{{route('category.store')}}">
+		<div class="modal-body">
+			<div class="form-group">
+				<label for="add">Category name</label>
+				{!! csrf_field() !!}
+				<input type="text" name="add_name" class="form-control" id="add">
+			</div>
+		</div>
+		<div class="modal-footer">
+			<input type="submit" class="btn btn-success" value="ADD">
+			<a href="{{route('category.index')}}" class="btn btn-default">Close</a>
+		</div>
+	</form>
+</div>
+@endif
+{{-- ==================== END CREAT MY CATEGORY =============  --}}
 
 {{-- =============== UPDATE MY CATEGORy ============== --}}
 @if(isset($categoryid))
@@ -58,7 +78,7 @@
       {{method_field('PUT')}}
       <div class="form-group">
             <label for="updcategname">Edit category name</label>
-            <input type="text" name="updcategname" class="form-control" id="updcategname" value="{{$categoryid->name}}">
+            <input type="text" name="add_name" class="form-control" id="updcategname" value="{{$categoryid->name}}">
       </div>
 			<input type="submit" class="btn btn-success" value="UPDATE">
         <a href="{{route('category.index')}}" class="btn btn-default" >CANCEL</a>
@@ -113,7 +133,7 @@
 			@foreach($myposts as $k=>$post)
 				<tr>
 				<td>{{$post->title}}</td>
-				<td>{!! str_limit($post->text, $limit=120, $end='......<a href='.route('posts.show',$post->id).'>READ MORE</a>') !!}</td>
+				<td>{!! str_limit($post->text, $limit=90, $end='......<a href='.route('posts.show',$post->id).'>READ MORE</a>') !!}</td>
 				<td>{{$post->created_at->format('d M Y')}}</td>
 				<td>
 					<form action="{{route('posts.destroy', $post->id)}}" method="post">

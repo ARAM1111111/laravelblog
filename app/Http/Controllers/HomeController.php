@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Post;
 use App\Contracts\CategoryServiceInterface;
+use App\Contracts\PostServiceInterface;
 
 class HomeController extends Controller
 {
@@ -24,15 +25,15 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Post $post, CategoryServiceInterface $categoryService) 
+    public function index(Post $post, PostServiceInterface $postservice) 
     {
-        $allposts =$post->with(['user','category'])->orderBy('created_at', 'DESC')->paginate(10);
+        $allposts = $postservice->getAllPosts();
         return view('home', compact('allposts'));
     }
 
-    public function show($id) 
+    public function show($id, PostServiceInterface $postservice) 
     {  
-        $onepost = Post::findOrFail($id);      
+        $onepost = $postservice->getOnePost($id);      
         return view('home', compact('onepost'));
     }
 }

@@ -12,6 +12,16 @@ class PostService implements PostServiceInterface
        $this->post = $post;
     }
 
+    public function getAllPosts() 
+    {
+        return $this->post->with(['user','category'])->orderBy('created_at', 'DESC')->paginate(10);
+    }
+
+    public function getUserPosts() 
+    {
+        return $this->post->where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->paginate(10);
+    }
+
 	public function createPost($user, $data)
 	{
 	    $this->post->create([
@@ -22,13 +32,13 @@ class PostService implements PostServiceInterface
         ]);
 	}
 
-    public function EditPost($id)
+    public function editPost($id)
     {
         $postid = $this->post->findOrFail($id);
         return $postid;
     }
 
-    public function UpdatePost($id, $data, $user)
+    public function updatePost($id, $data, $user)
     {
         $this->post = Post::findOrFail($id);
         $this->post->title = $data['ptitle'];
@@ -38,13 +48,18 @@ class PostService implements PostServiceInterface
         $this->post->update(); 
     }
 
-    public function DeletePost($id)
+    public function deletePost($id)
     {
        $delpost = $this->post->findOrFail($id);
        $delpost->delete();
     }
 
-    public function SecurityPost($id)
+    public function getOnePost($id) 
+    {
+        return $this->post->where('id', $id)->with('category')->first();
+    }
+
+    public function securityPost($id)
     {
         if (Auth::user()->id == $this->post->findOrFail($id)->user_id) {
             return true;

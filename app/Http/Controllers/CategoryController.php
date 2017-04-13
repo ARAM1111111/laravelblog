@@ -18,9 +18,9 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Category $category) 
+    public function index(CategoryServiceInterface $categoryService) 
     {      
-        $mycategory = $category->where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+        $mycategory = $categoryService->getUserCategories();
         return view('home',['mycategory' => $mycategory,'title' => 'MY CATEGORY']);
     }
 
@@ -31,7 +31,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return view('home', ['createcategory' => true, 'title' => "Create new Category"]); 
     }
 
 
@@ -41,9 +41,12 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) 
+    public function store(CategoryRequest $request, CategoryServiceInterface $categoryService) 
     {
-        //
+        $user = Auth::user()->id; 
+        $data = $request->except('_token');
+        $categoryService->createCategory($user, $data);
+        return redirect()->route('category.index')->with('status', 'NEW CATEGORY ADDED');
     }
 
     /**
@@ -65,7 +68,7 @@ class CategoryController extends Controller
      */
     public function edit($id, CategoryServiceInterface $categoryService) 
     {
-        $categoryid  = $categoryService->GetCategory($id);
+        $categoryid  = $categoryService->getCategory($id);
         $title = "EDIT CATEGORY PAGE";
         return view('/home',compact('categoryid', 'title'));
     }
@@ -77,12 +80,12 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCategoryRequest $request, $id, CategoryServiceInterface $categoryService)
+    public function update(CategoryRequest $request, $id, CategoryServiceInterface $categoryService)
     {
         $user = Auth::user()->id; 
         $data = $request->except('_token');
-        if ($categoryService->SecurityCategory($id)) {
-            $categoryService->UpdateCategory($id, $data, $user); 
+        if ($categoryService->securityCategory($id)) {
+            $categoryService->updateCategory($id, $data, $user); 
             return redirect()->route('category.index')->with('status', 'CATEGORY UPDATED');
         } else { 
             redirect()->route('category.index')->with('status', 'You havent premission'); 
@@ -98,22 +101,11 @@ class CategoryController extends Controller
      */
     public function destroy($id, CategoryServiceInterface $categoryService) 
     {
-        if ($categoryService->SecurityCategory($id)) {
-            $categoryService->DeleteCategory($id);
+        if ($categoryService->securityCategory($id)) {
+            $categoryService->deleteCategory($id);
             return redirect()->route('category.index')->with('status', 'CATEGORY DELETED');
         } else { 
             redirect()->route('category.index')->with('status', 'You havent premission'); 
-        }
-        
-    }
-
-    public function add(CategoryRequest $request, Category $category, CategoryServiceInterface $categoryService)
-    {
-        if ($request->method('post')) {       
-            $user = Auth::user()->id; 
-            $data = $request->except('_token');
-            $categoryService->createCategory($user, $data);   
-            return redirect()->route('category.index')->with('status', 'NEW CATEGORY ADDED');
-        }
+        }   
     }
 }
