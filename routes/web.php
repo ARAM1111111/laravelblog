@@ -11,8 +11,8 @@
 |
 */
 
-Route::get('/', 'IndexController@execute');
 Auth::routes();
+Route::get('/', 'HomeController@execute');
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/show/{id}', 'HomeController@show')->name('show');
 Route::resource('category', 'CategoryController');

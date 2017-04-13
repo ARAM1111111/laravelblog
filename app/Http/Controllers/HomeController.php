@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Category;
-use App\Models\Post;
 use App\Contracts\CategoryServiceInterface;
 use App\Contracts\PostServiceInterface;
 
@@ -25,15 +23,21 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Post $post, PostServiceInterface $postservice) 
+
+    public function index(PostServiceInterface $postService) 
     {
-        $allposts = $postservice->getAllPosts();
-        return view('home', compact('allposts'));
+        $allPosts = $postService->getAllPosts();
+        return view('home', compact('allPosts'));
     }
 
-    public function show($id, PostServiceInterface $postservice) 
+    public function show($id, PostServiceInterface $postService) 
     {  
-        $onepost = $postservice->getOnePost($id);      
-        return view('home', compact('onepost'));
+        $onePost = $postService->getOnePost($id);      
+        return view('home', compact('onePost'));
+    }
+
+    public function execute() 
+    {
+        return view('welcome');
     }
 }

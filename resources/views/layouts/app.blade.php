@@ -136,10 +136,6 @@
     }
 //=================================================
 $(document).ready(function(){
-    $('.addcateg').on('click',function(){
-       $('.modal-title').html('ADD NEW CATEG');
-    //    $('#form').html('<form method="post" action="/addcateg"><div class="modal-body"><div class="form-group"><label for="add">Categ name</label>{!! csrf_field() !!}<input type="text" name="add_name" class="form-control" id="add"></div></div><div class="modal-footer"><input type="submit" class="btn btn-success" value="ADD"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button><form>');
-    // });
 
     $('#img').on('change',function(){
         filePreview(this);

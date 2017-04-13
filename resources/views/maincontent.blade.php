@@ -1,22 +1,22 @@
 {{-- =============== All POSTS ============== --}}
-@if(isset($allposts))
-	<h1>IN SITE {{$allposts->count()}} POSTS</h1>	
-     @foreach($allposts as $apost)
-		   <hr>
-		  <h2>{{$apost->title}}</h2>
-	      <h5><span class="glyphicon glyphicon-time"></span> Post by {{$apost->user->name}}, {{$apost->created_at->format('d M Y')}}.</h5>
-	      <h5>Category <span class="label label-primary">{{$apost->category->name}}</span></h5><br>
-	      <p>{!! str_limit($apost->text,$limit=120,$end='......<a href='.url('show/'.$apost->id).'>READ MORE</a>') !!}</p>
+@if(isset($allPosts))
+	<h1>IN SITE {{$allPosts->count()}} POSTS</h1>	
+     @foreach($allPosts as $post)
+		  <hr>
+		  <h2>{{$post->title}}</h2>
+	      <h5><span class="glyphicon glyphicon-time"></span> Post by {{$post->user->name}}, {{$post->created_at->format('d M Y')}}.</h5>
+	      <h5>Category <span class="label label-primary">{{$post->category->name}}</span></h5><br>
+	      <p>{!! str_limit($post->text,$limit=120,$end='......<a href='.url('show/'.$post->id).'>READ MORE</a>') !!}</p>
 	      <br><br>
       @endforeach
       <div class="paginate col-md-offset-5">
-			{!!$allposts->links()!!}
+			{!!$allPosts->links()!!}
 	  </div>
 @endif
 {{-- ================= END ALL POSTS ============= --}}
 
 {{-- =============== SHOW MY CATEGORIAS ============== --}}
-@if(isset($mycategory))
+@if(isset($myCategory))
 	<h4><small>{{$title}}</small></h4>
     <div class="row">
 		<table class="table table-bordered">
@@ -25,14 +25,14 @@
 			   <th style="width: 20%;text-align: center;">Actions</th>
 			</tr>
 			<a href="{{route('category.create')}}" class="btn btn-info pull-right addcateg">CREATE NEW CATEGORY</a>
-			@foreach($mycategory as $k => $categ)
+			@foreach($myCategory as $k => $category)
 			  <tr>
-				<td>{{$categ->name}}</td>
+				<td>{{$category->name}}</td>
 				<td>
-					<form action="{{route('category.destroy',$categ->id)}}" method="post">
+					<form action="{{route('category.destroy',$category->id)}}" method="post">
 						{{method_field('delete')}}
 						{{csrf_field()}}
-						<a href="{{route('category.edit',$categ->id)}}" class="btn btn-primary" id="categ">EDIT</a>
+						<a href="{{route('category.edit',$category->id)}}" class="btn btn-primary" id="categ">EDIT</a>
 						<input type="submit" class="btn btn-danger" onclick="return confirm('ARE YOU SHURE???')" name='name' value='DELETE'>
 					</form>		
 				</td>
@@ -40,7 +40,7 @@
 			@endforeach
 		</table>
 		<div class="paginate col-md-offset-5">
-			{!!$mycategory->links()!!}
+			{!!$myCategory->links()!!}
 		</div>
 		
 	</div>
@@ -49,7 +49,7 @@
 {{-- =============== END SHOW MY CATEGORIAS ============== --}}
 
 {{-- ==================== CREAT MY CATEGORY =============  --}}
-@if(isset($createcategory))
+@if(isset($createCategory))
 <h4><small>{{$title}}</small></h4>
 <div class="row">
 	<form method="post" action="{{route('category.store')}}">
@@ -70,15 +70,15 @@
 {{-- ==================== END CREAT MY CATEGORY =============  --}}
 
 {{-- =============== UPDATE MY CATEGORy ============== --}}
-@if(isset($categoryid))
+@if(isset($categoryId))
 <h4><small>{{$title}}</small></h4>
 <div class="row">
-	<form method="post" class="col-md-6" action="{{route('category.update', $categoryid->id)}}">
+	<form method="post" class="col-md-6" action="{{route('category.update', $categoryId->id)}}">
       {{csrf_field()}}
       {{method_field('PUT')}}
       <div class="form-group">
             <label for="updcategname">Edit category name</label>
-            <input type="text" name="add_name" class="form-control" id="updcategname" value="{{$categoryid->name}}">
+            <input type="text" name="add_name" class="form-control" id="updcategname" value="{{$categoryId->name}}">
       </div>
 			<input type="submit" class="btn btn-success" value="UPDATE">
         <a href="{{route('category.index')}}" class="btn btn-default" >CANCEL</a>
@@ -88,24 +88,24 @@
 {{-- =============== END UPDATE MY CATEGORy ============== --}}
 
 {{-- =============== UPDATE MY POST ============== --}}
-@if(isset($postid))
+@if(isset($postId))
 <div class="modal-body">
-	<form method="post"  action="{{route('posts.update', $postid->id)}}">
+	<form method="post"  action="{{route('posts.update', $postId->id)}}">
         {{csrf_field()}}
         {{method_field('PUT')}}
       	<div class="form-group">
       		<input type="hidden" name="userid" value="{{Auth::user()->id}}">
         	<label for="ptitle">Post title</label>
-        	<input type="text" name="ptitle" class="form-control" id="ptitle" value="{{$postid->title}}">
+        	<input type="text" name="ptitle" class="form-control" id="ptitle" value="{{$postId->title}}">
         	<label for="ptext">Post text</label>
-        	<textarea name="ptext" cols="30" rows="10" class="form-control" id="ptext">{{$postid->text}}</textarea><br>
+        	<textarea name="ptext" cols="30" rows="10" class="form-control" id="ptext">{{$postId->text}}</textarea><br>
         	<label for="ptext">SELECT CATEG</label>
 		 	<select class="form-control" name="category">
-		 	@foreach($categorias as $c=>$categ )
-			  	<option value="{{$categ->id}}" name="category" {{($categ->id == $postid->category_id)?"selected":""}}>
-			  		{{$categ->name}}
-			  	</option>
-		 	@endforeach
+			 	@foreach($categorias as $c => $category )
+				  	<option value="{{$category->id}}" name="category" {{($category->id == $postId->category_id)?"selected":""}}>
+				  		{{$category->name}}
+				  	</option>
+			 	@endforeach
 			</select>
         </div>   
          	<input type="submit" class="btn btn-success" value='UPDATE'>
@@ -118,7 +118,7 @@
 
 
 {{-- ======================= SHOW MY POSTS ===================== --}}
-@if(isset($myposts))
+@if(isset($myPosts))
 <h4><small>{{$title}}</small></h4>
 <div class="row">
 		<table class="table table-bordered">
@@ -130,7 +130,7 @@
 			</tr>
 			<a href="{{route('posts.create')}}" class="btn btn-info pull-right addcateg" >CREATE NEW POST</a>
 			{{-- {{route('category.create')}} --}}
-			@foreach($myposts as $k=>$post)
+			@foreach($myPosts as $k=>$post)
 				<tr>
 				<td>{{$post->title}}</td>
 				<td>{!! str_limit($post->text, $limit=90, $end='......<a href='.route('posts.show',$post->id).'>READ MORE</a>') !!}</td>
@@ -147,7 +147,7 @@
 			@endforeach
 		</table>
 		<div class="paginate col-md-offset-5">
-			{!!$myposts->links()!!}
+			{!!$myPosts->links()!!}
 		</div>	
 	</div>
 @endif
@@ -156,12 +156,12 @@
 
 
 {{-- ============ SHOW POST DESCRIPTION ============================ --}}
-@if(isset($onepost))
-  <hr>
-      <h2>{{$onepost->title}}</h2>
-      <h5><span class="glyphicon glyphicon-time"></span> Post by {{$onepost->user->name}}, {{$onepost->created_at->format('d M Y')}}.</h5>
-      <h5>Category <span class="label label-primary">{{$onepost->category->name}}</span></h5><br>
-      <p>{{$onepost->text}}</p>
+@if(isset($onePost))
+  	  <hr>
+      <h2>{{$onePost->title}}</h2>
+      <h5><span class="glyphicon glyphicon-time"></span> Post by {{$onePost->user->name}}, {{$onePost->created_at->format('d M Y')}}.</h5>
+      <h5>Category <span class="label label-primary">{{$onePost->category->name}}</span></h5><br>
+      <p>{{$onePost->text}}</p>
       <br><br>
 
 @endif
@@ -170,7 +170,7 @@
 
 
 {{-- ================ CREATE NEW POST ================================ --}}
-@if(isset($newpost))
+@if(isset($newPost))
 <div class="modal-body">
 	<form method="post"  action="{{route('posts.store')}}">
         {{csrf_field()}}
@@ -182,9 +182,9 @@
         <textarea name="ptext" cols="30" rows="10" class="form-control" id="ptext"></textarea><br>
         <label for="ptext">SELECT CATEG</label>
 		<select class="form-control" name="category">
-		 @foreach($categories as $categ )
-		  	<option value="{{$categ->id}}" name="category">{{$categ->name}}</option>
-		 @endforeach
+			 @foreach($categories as $category )
+			  	<option value="{{$category->id}}" name="category">{{$category->name}}</option>
+			 @endforeach
 		</select>
       </div>
          <input type="submit" class="btn btn-success" value='ADD'>

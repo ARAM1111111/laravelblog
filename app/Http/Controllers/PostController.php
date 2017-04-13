@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
-use App\Models\Category;
-use App\Models\Post;
 use App\Http\Requests\PostRequest;
 use App\Contracts\PostServiceInterface;
 use App\Contracts\CategoryServiceInterface;
@@ -17,10 +15,10 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(PostServiceInterface $postservice) 
+    public function index(PostServiceInterface $postService) 
     {
-        $myposts = $postservice->getUserPosts();
-        return view('home', ['myposts' => $myposts,'title' => 'MY POSTS']);
+        $myPosts = $postService->getUserPosts();
+        return view('home', ['myPosts' => $myPosts,'title' => 'MY POSTS']);
     }
 
     /**
@@ -28,10 +26,10 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(CategoryServiceInterface $categoryservice) 
+    public function create(CategoryServiceInterface $categoryService) 
     {
-        $categories = $categoryservice->getAllCategories();
-        return view('home', ['newpost' => 'newpost','categories' => $categories]);        
+        $categories = $categoryService->getAllCategories();
+        return view('home', ['newPost' => 'newPost','categories' => $categories]);        
     }
 
     /**
@@ -40,12 +38,15 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(PostRequest $request, PostServiceInterface $postservice) 
+    public function store(PostRequest $request, PostServiceInterface $postService) 
     {  
         $user = Auth::user()->id; 
         $data = $request->except('_token');
-        $postservice->createPost($user, $data);
-        return redirect()->route('posts.index')->with('status', 'NEW POST ADDED');
+        if ($postService->createPost($user, $data)) {
+            return redirect()->route('posts.index')->with('status', 'NEW POST ADDED');
+        } else {
+            return redirect()->route('posts.index')->with('status', 'POST DONT ADDED');
+        }
     }
     
     /**
@@ -54,11 +55,15 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id, PostServiceInterface $postservice)
+    public function show($id, PostServiceInterface $postService)
     {  
-        $onepost = $postservice->getOnePost($id); 
-        $onepost['username'] = Auth()->user()->name;
-        return view('/home', compact('onepost'));
+        if ($postService->getOnePost($id)) {
+            $onePost = $postService->getOnePost($id); 
+            $onePost['username'] = Auth()->user()->name;
+            return view('/home', compact('onePost'));    
+        } else {
+            return view('/home')->with('status', 'CANT FIND POST'); 
+        }
     }
 
     /**
@@ -67,12 +72,12 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id, PostServiceInterface $postservice, CategoryServiceInterface $categoryservice) 
+    public function edit($id, PostServiceInterface $postService, CategoryServiceInterface $categoryService) 
     {
-        $postid = $postservice->editPost($id);
-        $categorias = $categoryservice->getAllCategories();
+        $postId = $postService->editPost($id);
+        $categorias = $categoryService->getAllCategories();
         $title = "EDIT POST PAGE";
-        return view('/home', compact('postid', 'title', 'categorias'));
+        return view('/home', compact('postId', 'title', 'categorias'));
     }
 
     /**
@@ -82,12 +87,12 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(PostRequest $request, $id, PostServiceInterface $postservice) 
+    public function update(PostRequest $request, $id, PostServiceInterface $postService) 
     {
         $user = Auth::user()->id; 
         $data = $request->except('_token');
-        if ($postservice->securityPost($id)) {
-            $postservice->updatePost($id, $data, $user);
+        if ($postService->securityPost($id)) {
+            $postService->updatePost($id, $data, $user);
             return redirect()->route('posts.index')->with('status', 'POST UPDATED');
         } else {
             redirect()->route('posts.index')->with('status', 'You havent premission'); 
@@ -101,10 +106,10 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function destroy($id, PostServiceInterface $postservice) 
+    public function destroy($id, PostServiceInterface $postService) 
     {
-        if ($postservice->securityPost($id)) {
-            $postservice->deletePost($id);
+        if ($postService->securityPost($id)) {
+            $postService->deletePost($id);
             return redirect()->route('posts.index')->with('status', 'POST DELETED');
         } else {    
             redirect()->route('posts.index')->with('status', 'You havent premission');

@@ -3,12 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Validator;
 use Auth;
-use App\Models\Category;
-use App\Models\Post;
 use App\Http\Requests\CategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
 use App\Contracts\CategoryServiceInterface;
 
 class CategoryController extends Controller
@@ -20,8 +16,8 @@ class CategoryController extends Controller
      */
     public function index(CategoryServiceInterface $categoryService) 
     {      
-        $mycategory = $categoryService->getUserCategories();
-        return view('home',['mycategory' => $mycategory,'title' => 'MY CATEGORY']);
+        $myCategory = $categoryService->getUserCategories();
+        return view('home',['myCategory' => $myCategory,'title' => 'MY CATEGORY']);
     }
 
     /**
@@ -31,7 +27,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('home', ['createcategory' => true, 'title' => "Create new Category"]); 
+        return view('home', ['createCategory' => true, 'title' => "Create new Category"]); 
     }
 
 
@@ -45,8 +41,11 @@ class CategoryController extends Controller
     {
         $user = Auth::user()->id; 
         $data = $request->except('_token');
-        $categoryService->createCategory($user, $data);
-        return redirect()->route('category.index')->with('status', 'NEW CATEGORY ADDED');
+        if ($categoryService->createCategory($user, $data)) {
+            return redirect()->route('category.index')->with('status', 'NEW CATEGORY ADDED');
+        } else {
+            return redirect()->route('category.index')->with('status', 'CATEGORY DONT CREATED');    
+        }
     }
 
     /**
@@ -68,9 +67,9 @@ class CategoryController extends Controller
      */
     public function edit($id, CategoryServiceInterface $categoryService) 
     {
-        $categoryid  = $categoryService->getCategory($id);
+        $categoryId  = $categoryService->getCategory($id);
         $title = "EDIT CATEGORY PAGE";
-        return view('/home',compact('categoryid', 'title'));
+        return view('/home',compact('categoryId', 'title'));
     }
 
     /**
