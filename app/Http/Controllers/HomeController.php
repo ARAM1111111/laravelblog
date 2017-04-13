@@ -32,8 +32,13 @@ class HomeController extends Controller
 
     public function show($id, PostServiceInterface $postService) 
     {  
-        $onePost = $postService->getOnePost($id);      
-        return view('home', compact('onePost'));
+        if ($postService->getOnePost($id)) {
+            $onePost = $postService->getOnePost($id); 
+            $onePost['username'] = Auth()->user()->name;
+            return view('/home', compact('onePost'));    
+        } else {
+            return view('/home')->with('warning', 'CANT FIND POST'); 
+        }
     }
 
     public function execute() 

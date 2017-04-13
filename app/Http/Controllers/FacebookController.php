@@ -33,8 +33,8 @@ class FacebookController extends Controller
             return redirect()->route('home');
         } else {
             $user =User::create([
-                'name'=>$user->getName(),
-                'email'=>$user->getEmail()
+                'name' => $user->getName(),
+                'email' => $user->getEmail()
             ]);
             Auth::login($user);
             return redirect()->route('home');

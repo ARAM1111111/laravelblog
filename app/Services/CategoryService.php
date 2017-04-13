@@ -12,26 +12,20 @@ class CategoryService implements CategoryServiceInterface
         $this->category = $category;
     }
 
-    public function createCategory($user, $data) 
+    public function createCategory($data) 
     {
-        $this->category ->create([
-            'name' => $data['add_name'],
-            'user_id' => $user,
-        ]);
+        return $this->category ->create($data);
     }
 
-    public function updateCategory($id, $data, $user) 
+    public function updateCategory($id, $data) 
     {
-        $updat = $this->category->findOrFail($id);
-        $updat->name = $data['add_name'];
-        $updat->user_id = $user;
-        $updat->save();
+        return $this->category->findOrFail($id)->update($data);
     }
 
     public function deleteCategory($id) 
     {
-        $delcategory = $this->category->findOrFail($id);
-        $delcategory->delete();
+        $delcategory = $this->category->findOrFail($id)->delete();
+        return true;
     }
 
     public function getAllCategories() 
@@ -47,7 +41,7 @@ class CategoryService implements CategoryServiceInterface
     public function securityCategory($id) 
     {
         if (Auth::user()->id == $this->category->findOrFail($id)->user_id) {
-          // ETE IRA GRACI HETA MANIPULIACIANER ANUM
+          // IF HIS WRITE
             return true;   
         }
     }

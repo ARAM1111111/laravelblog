@@ -39,12 +39,12 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request, CategoryServiceInterface $categoryService) 
     {
-        $user = Auth::user()->id; 
         $data = $request->except('_token');
-        if ($categoryService->createCategory($user, $data)) {
-            return redirect()->route('category.index')->with('status', 'NEW CATEGORY ADDED');
+        $data['user_id'] = Auth::user()->id; 
+        if ($categoryService->createCategory($data)) {
+            return redirect()->route('category.index')->with('success', 'NEW CATEGORY ADDED');
         } else {
-            return redirect()->route('category.index')->with('status', 'CATEGORY DONT CREATED');    
+            return redirect()->route('category.index')->with('warning', 'CATEGORY DONT CREATED');    
         }
     }
 
@@ -81,13 +81,16 @@ class CategoryController extends Controller
      */
     public function update(CategoryRequest $request, $id, CategoryServiceInterface $categoryService)
     {
-        $user = Auth::user()->id; 
         $data = $request->except('_token');
+        $data['user_id'] = Auth::user()->id; 
         if ($categoryService->securityCategory($id)) {
-            $categoryService->updateCategory($id, $data, $user); 
-            return redirect()->route('category.index')->with('status', 'CATEGORY UPDATED');
+            if ($categoryService->updateCategory($id, $data)) {
+                return redirect()->route('category.index')->with('success', 'CATEGORY UPDATED');    
+            } else {
+                return redirect()->route('category.index')->with('warning', 'CATEGORY DONT UPDATED');
+            }       
         } else { 
-            redirect()->route('category.index')->with('status', 'You havent premission'); 
+            redirect()->route('category.index')->with('warning', 'YOU hHAVENT PREMISSION'); 
         }
         
     }
@@ -101,10 +104,13 @@ class CategoryController extends Controller
     public function destroy($id, CategoryServiceInterface $categoryService) 
     {
         if ($categoryService->securityCategory($id)) {
-            $categoryService->deleteCategory($id);
-            return redirect()->route('category.index')->with('status', 'CATEGORY DELETED');
+            if ($categoryService->deleteCategory($id)) {
+               return redirect()->route('category.index')->with('success', 'CATEGORY DELETED'); 
+           } else {
+                return redirect()->route('category.index')->with('warning', 'CATEGORY DONT DELETED');
+           }     
         } else { 
-            redirect()->route('category.index')->with('status', 'You havent premission'); 
+            redirect()->route('category.index')->with('warning', 'YOU HAVENT PREMISSION'); 
         }   
     }
 }

@@ -40,12 +40,12 @@ class PostController extends Controller
      */
     public function store(PostRequest $request, PostServiceInterface $postService) 
     {  
-        $user = Auth::user()->id; 
         $data = $request->except('_token');
-        if ($postService->createPost($user, $data)) {
-            return redirect()->route('posts.index')->with('status', 'NEW POST ADDED');
+        $data['user_id'] = Auth::user()->id; 
+        if ($postService->createPost($data)) {
+            return redirect()->route('posts.index')->with('success', 'NEW POST ADDED');
         } else {
-            return redirect()->route('posts.index')->with('status', 'POST DONT ADDED');
+            return redirect()->route('posts.index')->with('warning', 'POST DONT ADDED');
         }
     }
     
@@ -62,7 +62,7 @@ class PostController extends Controller
             $onePost['username'] = Auth()->user()->name;
             return view('/home', compact('onePost'));    
         } else {
-            return view('/home')->with('status', 'CANT FIND POST'); 
+            return view('/home')->with('warning', 'CANT FIND POST'); 
         }
     }
 
@@ -89,13 +89,16 @@ class PostController extends Controller
      */
     public function update(PostRequest $request, $id, PostServiceInterface $postService) 
     {
-        $user = Auth::user()->id; 
         $data = $request->except('_token');
+        $data['user_id'] = Auth::user()->id; 
         if ($postService->securityPost($id)) {
-            $postService->updatePost($id, $data, $user);
-            return redirect()->route('posts.index')->with('status', 'POST UPDATED');
+            if ($postService->updatePost($id, $data)) {
+                return redirect()->route('posts.index')->with('success', 'POST UPDATED');
+            } else {
+                return redirect()->route('posts.index')->with('warning', 'POST DONT UPDATED');
+            }     
         } else {
-            redirect()->route('posts.index')->with('status', 'You havent premission'); 
+            redirect()->route('posts.index')->with('warning', 'YOU HAVENT PREMISSION'); 
         }      
     }
 
@@ -109,10 +112,13 @@ class PostController extends Controller
     public function destroy($id, PostServiceInterface $postService) 
     {
         if ($postService->securityPost($id)) {
-            $postService->deletePost($id);
-            return redirect()->route('posts.index')->with('status', 'POST DELETED');
+            if ($postService->deletePost($id)) {
+                return redirect()->route('posts.index')->with('success', 'POST DELETED');    
+            } else {
+                return redirect()->route('posts.index')->with('warning', 'POST DONT DELETED');
+            }       
         } else {    
-            redirect()->route('posts.index')->with('status', 'You havent premission');
+            redirect()->route('posts.index')->with('warning', 'YOU HAVENT PREMISSION');
         }
     }
 }

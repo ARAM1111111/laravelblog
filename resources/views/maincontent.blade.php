@@ -57,7 +57,7 @@
 			<div class="form-group">
 				<label for="add">Category name</label>
 				{!! csrf_field() !!}
-				<input type="text" name="add_name" class="form-control" id="add">
+				<input type="text" name="name" class="form-control" id="add">
 			</div>
 		</div>
 		<div class="modal-footer">
@@ -69,7 +69,7 @@
 @endif
 {{-- ==================== END CREAT MY CATEGORY =============  --}}
 
-{{-- =============== UPDATE MY CATEGORy ============== --}}
+{{-- =============== UPDATE MY CATEGORY ============== --}}
 @if(isset($categoryId))
 <h4><small>{{$title}}</small></h4>
 <div class="row">
@@ -78,7 +78,7 @@
       {{method_field('PUT')}}
       <div class="form-group">
             <label for="updcategname">Edit category name</label>
-            <input type="text" name="add_name" class="form-control" id="updcategname" value="{{$categoryId->name}}">
+            <input type="text" name="name" class="form-control" id="updcategname" value="{{$categoryId->name}}">
       </div>
 			<input type="submit" class="btn btn-success" value="UPDATE">
         <a href="{{route('category.index')}}" class="btn btn-default" >CANCEL</a>
@@ -94,13 +94,12 @@
         {{csrf_field()}}
         {{method_field('PUT')}}
       	<div class="form-group">
-      		<input type="hidden" name="userid" value="{{Auth::user()->id}}">
         	<label for="ptitle">Post title</label>
-        	<input type="text" name="ptitle" class="form-control" id="ptitle" value="{{$postId->title}}">
+        	<input type="text" name="title" class="form-control" id="ptitle" value="{{$postId->title}}">
         	<label for="ptext">Post text</label>
-        	<textarea name="ptext" cols="30" rows="10" class="form-control" id="ptext">{{$postId->text}}</textarea><br>
+        	<textarea name="text" cols="30" rows="10" class="form-control" id="ptext">{{$postId->text}}</textarea><br>
         	<label for="ptext">SELECT CATEG</label>
-		 	<select class="form-control" name="category">
+		 	<select class="form-control" name="category_id">
 			 	@foreach($categorias as $c => $category )
 				  	<option value="{{$category->id}}" name="category" {{($category->id == $postId->category_id)?"selected":""}}>
 				  		{{$category->name}}
@@ -177,13 +176,13 @@
       <div class="form-group">
       	<input type="hidden" name="userid" value="{{Auth::user()->id}}">
         <label for="ptitle">Post title</label>
-        <input type="text" name="ptitle" class="form-control" id="ptitle">
+        <input type="text" name="title" class="form-control" id="ptitle">
         <label for="ptext">Post text</label>
-        <textarea name="ptext" cols="30" rows="10" class="form-control" id="ptext"></textarea><br>
+        <textarea name="text" cols="30" rows="10" class="form-control" id="ptext"></textarea><br>
         <label for="ptext">SELECT CATEG</label>
-		<select class="form-control" name="category">
+		<select class="form-control" name="category_id">
 			 @foreach($categories as $category )
-			  	<option value="{{$category->id}}" name="category">{{$category->name}}</option>
+			  	<option value="{{$category->id}}">{{$category->name}}</option>
 			 @endforeach
 		</select>
       </div>

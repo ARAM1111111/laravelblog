@@ -3,9 +3,15 @@
 @section('content')
 
 <div class="container-fluid">
-@if(session('status'))
+@if(session('warning'))
+  <div class="alert alert-warning">
+    {{session('warning')}}
+  </div>
+@endif
+
+@if(session('success'))
   <div class="alert alert-success">
-    {{session('status')}}
+    {{session('success')}}
   </div>
 @endif
      
