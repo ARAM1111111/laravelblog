@@ -18,7 +18,7 @@ class PostController extends Controller
     public function index(PostServiceInterface $postService) 
     {
         $myPosts = $postService->getUserPosts();
-        return view('home', ['myPosts' => $myPosts,'title' => 'MY POSTS']);
+        return view('posts.index', ['myPosts' => $myPosts,'title' => 'My posts']);
     }
 
     /**
@@ -29,7 +29,7 @@ class PostController extends Controller
     public function create(CategoryServiceInterface $categoryService) 
     {
         $categories = $categoryService->getAllCategories();
-        return view('home', ['newPost' => 'newPost','categories' => $categories]);        
+        return view('posts.create', ['newPost' => 'newPost','categories' => $categories]);        
     }
 
     /**
@@ -43,9 +43,9 @@ class PostController extends Controller
         $data = $request->except('_token');
         $data['user_id'] = Auth::user()->id; 
         if ($postService->createPost($data)) {
-            return redirect()->route('posts.index')->with('success', 'NEW POST ADDED');
+            return redirect()->route('posts.index')->with('success', 'New post added');
         } else {
-            return redirect()->route('posts.index')->with('warning', 'POST DONT ADDED');
+            return redirect()->route('posts.index')->with('warning', 'Post dont added');
         }
     }
     
@@ -60,9 +60,9 @@ class PostController extends Controller
         if ($postService->getOnePost($id)) {
             $onePost = $postService->getOnePost($id); 
             $onePost['username'] = Auth()->user()->name;
-            return view('/home', compact('onePost'));    
+            return view('posts.show', compact('onePost'));    
         } else {
-            return view('/home')->with('warning', 'CANT FIND POST'); 
+            return view('/home')->with('warning', 'Cant find post'); 
         }
     }
 
@@ -77,7 +77,7 @@ class PostController extends Controller
         $postId = $postService->editPost($id);
         $categorias = $categoryService->getAllCategories();
         $title = "EDIT POST PAGE";
-        return view('/home', compact('postId', 'title', 'categorias'));
+        return view('posts.edit', compact('postId', 'title', 'categorias'));
     }
 
     /**
@@ -91,14 +91,10 @@ class PostController extends Controller
     {
         $data = $request->except('_token');
         $data['user_id'] = Auth::user()->id; 
-        if ($postService->securityPost($id)) {
-            if ($postService->updatePost($id, $data)) {
-                return redirect()->route('posts.index')->with('success', 'POST UPDATED');
-            } else {
-                return redirect()->route('posts.index')->with('warning', 'POST DONT UPDATED');
-            }     
+        if ($postService->securityPost($id) & $postService->updatePost($id, $data)) {
+            return redirect()->route('posts.index')->with('success', 'Post updated');    
         } else {
-            redirect()->route('posts.index')->with('warning', 'YOU HAVENT PREMISSION'); 
+            redirect()->route('posts.index')->with('warning', 'Cant update post'); 
         }      
     }
 
@@ -111,14 +107,10 @@ class PostController extends Controller
 
     public function destroy($id, PostServiceInterface $postService) 
     {
-        if ($postService->securityPost($id)) {
-            if ($postService->deletePost($id)) {
-                return redirect()->route('posts.index')->with('success', 'POST DELETED');    
-            } else {
-                return redirect()->route('posts.index')->with('warning', 'POST DONT DELETED');
-            }       
+        if ($postService->securityPost($id) & $postService->deletePost($id)) {
+            return redirect()->route('posts.index')->with('success', 'Post deleted');      
         } else {    
-            redirect()->route('posts.index')->with('warning', 'YOU HAVENT PREMISSION');
+            redirect()->route('posts.index')->with('warning', 'Cant delete post');
         }
     }
 }

@@ -112,9 +112,48 @@
                 </div>
             </div>
         </nav>
+<div class="container-fluid">
+    @if(session('warning'))
+      <div class="alert alert-warning">
+        {{session('warning')}}
+      </div>
+    @endif
 
-        @yield('content')
+    @if(session('success'))
+      <div class="alert alert-success">
+        {{session('success')}}
+      </div>
+    @endif
+         
+    @if(count($errors)>0)
+    <div class="alert alert-danger">
+        <ul>
+          @foreach($errors->all() as $err)
+             <li>{{$err}}</li>
+          @endforeach
+        </ul>
     </div>
+    @endif
+    <div class="row content">
+      @include ('layouts.sidebar')
+      <div class="col-sm-9">
+      @yield('content')  
+        <!-- Modal -->
+        <div id="myModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Modal Header</h4>
+                </div>
+                <div id="form"></div> 
+            </div>  
+          </div>       
+        </div>
+      </div>
+    </div>
+</div>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>

@@ -35,9 +35,9 @@ class HomeController extends Controller
         if ($postService->getOnePost($id)) {
             $onePost = $postService->getOnePost($id); 
             $onePost['username'] = Auth()->user()->name;
-            return view('/home', compact('onePost'));    
+            return view('posts.show', compact('onePost'));    
         } else {
-            return view('/home')->with('warning', 'CANT FIND POST'); 
+            return view('/home')->with('warning', 'Cant find post'); 
         }
     }
 

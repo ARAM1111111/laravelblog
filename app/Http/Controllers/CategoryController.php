@@ -17,7 +17,7 @@ class CategoryController extends Controller
     public function index(CategoryServiceInterface $categoryService) 
     {      
         $myCategory = $categoryService->getUserCategories();
-        return view('home',['myCategory' => $myCategory,'title' => 'MY CATEGORY']);
+        return view('categories.index',['myCategory' => $myCategory,'title' => 'My category']);
     }
 
     /**
@@ -27,7 +27,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('home', ['createCategory' => true, 'title' => "Create new Category"]); 
+        return view('categories.create', ['createCategory' => true, 'title' => "Create new category"]); 
     }
 
 
@@ -42,9 +42,9 @@ class CategoryController extends Controller
         $data = $request->except('_token');
         $data['user_id'] = Auth::user()->id; 
         if ($categoryService->createCategory($data)) {
-            return redirect()->route('category.index')->with('success', 'NEW CATEGORY ADDED');
+            return redirect()->route('category.index')->with('success', 'New category added');
         } else {
-            return redirect()->route('category.index')->with('warning', 'CATEGORY DONT CREATED');    
+            return redirect()->route('category.index')->with('warning', 'Category dont added');    
         }
     }
 
@@ -68,8 +68,8 @@ class CategoryController extends Controller
     public function edit($id, CategoryServiceInterface $categoryService) 
     {
         $categoryId  = $categoryService->getCategory($id);
-        $title = "EDIT CATEGORY PAGE";
-        return view('/home',compact('categoryId', 'title'));
+        $title = "Edit category page";
+        return view('categories.edit',compact('categoryId', 'title'));
     }
 
     /**
@@ -83,14 +83,10 @@ class CategoryController extends Controller
     {
         $data = $request->except('_token');
         $data['user_id'] = Auth::user()->id; 
-        if ($categoryService->securityCategory($id)) {
-            if ($categoryService->updateCategory($id, $data)) {
-                return redirect()->route('category.index')->with('success', 'CATEGORY UPDATED');    
-            } else {
-                return redirect()->route('category.index')->with('warning', 'CATEGORY DONT UPDATED');
-            }       
+        if ($categoryService->securityCategory($id) & $categoryService->updateCategory($id, $data)) {  
+            return redirect()->route('category.index')->with('success', 'Category updated');        
         } else { 
-            redirect()->route('category.index')->with('warning', 'YOU hHAVENT PREMISSION'); 
+            redirect()->route('category.index')->with('warning', 'Problem cant update'); 
         }
         
     }
@@ -103,14 +99,10 @@ class CategoryController extends Controller
      */
     public function destroy($id, CategoryServiceInterface $categoryService) 
     {
-        if ($categoryService->securityCategory($id)) {
-            if ($categoryService->deleteCategory($id)) {
-               return redirect()->route('category.index')->with('success', 'CATEGORY DELETED'); 
-           } else {
-                return redirect()->route('category.index')->with('warning', 'CATEGORY DONT DELETED');
-           }     
+        if ($categoryService->securityCategory($id) & $categoryService->deleteCategory($id)) {        
+            return redirect()->route('category.index')->with('success', 'Category deleted');           
         } else { 
-            redirect()->route('category.index')->with('warning', 'YOU HAVENT PREMISSION'); 
+            redirect()->route('category.index')->with('warning', 'Problem cant delete'); 
         }   
     }
 }
